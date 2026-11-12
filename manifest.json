@@ -1,0 +1,9 @@
+{
+  "name": "Моя вода",
+  "short_name": "Моя вода",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f3f3",
+  "theme_color": "#f7e9ec",
+  "icons": []
+}

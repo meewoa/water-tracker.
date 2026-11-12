@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7e9ec">
+<meta name="description" content="Нежный трекер воды: цель, история, статистика и напоминания.">
+<link rel="manifest" href="manifest.json">
+<title>Моя вода</title>
+<style>
+:root{
+ --bg:#f5f3f3;--paper:#fffdfd;--pink:#e9c6ce;--pink2:#f6e6e9;--pink3:#d9aeb9;
+ --ink:#514b4d;--muted:#92898c;--line:#eee7e8;--gray:#e8e5e6;--shadow:0 12px 32px rgba(105,78,85,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 22px}
+.brand{font-size:22px;font-weight:750;letter-spacing:-.6px}.brand span{color:var(--pink3)}
+.date{font-size:12px;color:var(--muted);background:#fff;padding:8px 12px;border-radius:30px}
+.hero{background:linear-gradient(135deg,#f8e9ec,#f1e9eb 75%);border:1px solid #f0e1e4;border-radius:28px;padding:24px 20px;box-shadow:var(--shadow)}
+.eyebrow{font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#9b7d84;font-weight:700}
+.hero h1{font-size:26px;line-height:1.15;margin:8px 0 5px;letter-spacing:-.7px}
+.sub{font-size:13px;color:#8f7f83}
+.progress-area{display:flex;align-items:center;justify-content:center;gap:24px;margin:22px 0 14px;flex-wrap:wrap}
+.ring{width:174px;height:174px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--pink3) var(--progress,0%),#ffffffb8 0);position:relative}
+.ring:before{content:"";position:absolute;inset:11px;background:#fbf5f6;border-radius:50%}
+.ring-inner{z-index:1;text-align:center}.amount{font-size:31px;font-weight:750;letter-spacing:-1px}.unit{font-size:12px;color:var(--muted)}
+.goal-side{min-width:130px}.goal-side strong{display:block;font-size:22px}.goal-side small{color:var(--muted);font-size:12px}
+.progress-line{height:8px;background:#ffffffb8;border-radius:20px;overflow:hidden;margin-top:10px}.progress-line span{display:block;height:100%;width:0;background:var(--pink3);border-radius:20px;transition:width .25s}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:17px;box-shadow:var(--shadow)}
+.card h2{font-size:15px;margin:0 0 13px;letter-spacing:-.2px}
+.muted{font-size:12px;color:var(--muted)}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.preset{border:1px solid #eadadd;background:#fbf3f5;color:#806b70;border-radius:13px;padding:10px 13px;font-weight:650;font-size:13px;cursor:pointer}
+.preset:active,.primary:active{transform:scale(.98)}
+.primary{border:0;background:#dcb5bf;color:#fff;border-radius:14px;padding:12px 15px;font-weight:700;cursor:pointer}
+.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:13px;padding:10px 13px;cursor:pointer}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}
+input[type=number],input[type=time],select{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;color:var(--ink);outline:none}
+.field{display:grid;gap:6px;flex:1}.field label{font-size:11px;color:var(--muted)}
+.section{margin-top:14px}
+.entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.entry:last-child{border:0}.entry small{color:var(--muted);display:block;margin-top:3px}
+.delete{border:0;background:#f6eff0;color:#a17c85;border-radius:10px;padding:7px 10px;cursor:pointer}
+.barlist{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:130px;margin-top:14px}
+.daybar{display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:7px}
+.bartrack{height:94px;width:100%;max-width:34px;background:#f2edef;border-radius:12px;display:flex;align-items:end;overflow:hidden}
+.barfill{width:100%;background:linear-gradient(#e8c3cc,#d6a8b4);border-radius:12px;min-height:2px}
+.daybar b{font-size:10px;color:var(--muted);font-weight:600}.daybar small{font-size:9px;color:#9b8f92}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.setting:last-child{border:0}
+.switch{appearance:none;width:42px;height:24px;background:#ded9db;border-radius:20px;position:relative;cursor:pointer;flex:none}
+.switch:checked{background:#d7a9b5}.switch:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s}.switch:checked:before{transform:translateX(18px)}
+.note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#554b4e;color:white;padding:11px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;max-width:90%;text-align:center}
+.toast.show{opacity:1}
+@media(min-width:620px){.wrap{padding-top:30px}.hero{padding:30px 34px}.hero h1{font-size:30px}}
+@media(max-width:390px){.cards{grid-template-columns:1fr}.progress-area{gap:15px}.ring{width:155px;height:155px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="brand">моя <span>вода</span> ♡</div><div class="date" id="todayLabel"></div></header>
+<section class="hero">
+ <div class="eyebrow">Твой маленький ритуал заботы</div>
+ <h1>Не забывай пить воду</h1>
+ <div class="sub">Отмечай каждый стакан — остальное посчитаем за тебя.</div>
+ <div class="progress-area">
+  <div class="ring" id="ring"><div class="ring-inner"><div class="amount" id="drank">0</div><div class="unit">мл выпито</div></div></div>
+  <div class="goal-side"><small>Твоя цель на сегодня</small><strong><span id="goalText">1800</span> мл</strong><small id="leftText">Осталось 1800 мл</small><div class="progress-line"><span id="progressFill"></span></div><small id="percentText">0% от цели</small></div>
+ </div>
+ <div class="controls" style="justify-content:center">
+  <button class="preset" data-add="100">+100 мл</button><button class="preset" data-add="200">+200 мл</button><button class="preset" data-add="300">+300 мл</button><button class="preset" data-add="500">+500 мл</button>
+ </div>
+</section>
+<div class="cards">
+ <section class="card">
+  <h2>Добавить воду</h2>
+  <div class="row">
+   <div class="field"><label for="customAmount">Свой объём, мл</label><input id="customAmount" type="number" min="1" step="1" placeholder="Например, 250"></div>
+   <button class="primary" id="addCustom" style="margin-top:17px">Добавить</button>
+  </div>
+  <div class="field" style="margin-top:13px"><label for="glassSize">Объём твоего стакана</label><select id="glassSize"><option value="150">150 мл</option><option value="200" selected>200 мл</option><option value="250">250 мл</option><option value="300">300 мл</option><option value="350">350 мл</option><option value="500">500 мл</option></select></div>
+  <button class="secondary" id="addGlass" style="width:100%;margin-top:10px">＋ Добавить 1 стакан</button>
+ </section>
+ <section class="card">
+  <h2>Настройки цели</h2>
+  <div class="field"><label for="goalInput">Моя цель на день, мл</label><input id="goalInput" type="number" min="1" max="10000" step="50" value="1800"></div>
+  <button class="secondary" id="saveGoal" style="width:100%;margin-top:10px">Сохранить цель</button>
+  <p class="note">Цель можно менять в любое время. Ориентируйся на свои потребности и рекомендации специалиста, если они у тебя есть.</p>
+ </section>
+</div>
+<section class="card section">
+ <div class="row" style="justify-content:space-between"><h2 style="margin:0">Сегодняшняя история</h2><span class="muted" id="entryCount">0 записей</span></div>
+ <div id="historyList" class="muted" style="padding-top:12px">Пока записей нет. Добавь первый стакан ♡</div>
+</section>
+<section class="card section">
+ <div class="row" style="justify-content:space-between"><h2 style="margin:0">Статистика за неделю</h2><span class="muted">последние 7 дней</span></div>
+ <div class="barlist" id="weekBars"></div>
+ <div class="row" style="justify-content:space-between;margin-top:14px"><span class="muted">Среднее за день</span><strong id="weeklyAverage">0 мл</strong></div>
+</section>
+<section class="card section">
+ <h2>Напоминания</h2>
+ <div class="setting"><div><strong style="font-size:13px">Включить напоминания</strong><div class="muted">Пока приложение открыто</div></div><input class="switch" type="checkbox" id="remindersOn"></div>
+ <div class="row" style="margin-top:12px">
+  <div class="field"><label for="startTime">Начало</label><input type="time" id="startTime" value="09:00"></div>
+  <div class="field"><label for="endTime">Окончание</label><input type="time" id="endTime" value="21:00"></div>
+  <div class="field"><label for="interval">Каждые</label><select id="interval"><option value="30">30 мин</option><option value="60" selected>1 час</option><option value="90">1,5 часа</option><option value="120">2 часа</option></select></div>
+ </div>
+ <div class="row" style="margin-top:12px"><button class="primary" id="saveReminders">Сохранить напоминания</button><button class="secondary" id="notifyPermission">Разрешить уведомления</button></div>
+ <p class="note" id="reminderNote">Напоминания срабатывают, пока страница открыта. Для уведомлений браузера нужно отдельно разрешить их. На iPhone возможности уведомлений зависят от того, добавлен ли сайт на экран «Домой».</p>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const key='my-water-tracker-v1';
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+let data=JSON.parse(localStorage.getItem(key)||'{}');
+data.goal=data.goal||1800;data.glass=data.glass||200;data.days=data.days||{};data.reminders=data.reminders||{on:false,start:'09:00',end:'21:00',interval:60};
+let lastReminder=Date.now();
+function save(){localStorage.setItem(key,JSON.stringify(data))}
+function entries(){return data.days[today()]||[]}
+function total(day=today()){return (data.days[day]||[]).reduce((s,e)=>s+e.ml,0)}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function addWater(ml){ml=Math.round(Number(ml));if(!ml||ml<1||ml>5000){toast('Введи объём от 1 до 5000 мл');return}if(!data.days[today()])data.days[today()]=[];data.days[today()].push({ml,time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})});save();render();toast(`Добавлено ${ml} мл ♡`)}
+function render(){
+ const sum=total(),pct=Math.min(100,Math.round(sum/data.goal*100)),left=Math.max(0,data.goal-sum);
+ $('drank').textContent=sum.toLocaleString('ru-RU');$('goalText').textContent=data.goal.toLocaleString('ru-RU');$('leftText').textContent=left?`Осталось ${left.toLocaleString('ru-RU')} мл`:'Цель на сегодня достигнута ♡';$('percentText').textContent=pct+'% от цели';$('ring').style.setProperty('--progress',pct+'%');$('progressFill').style.width=pct+'%';
+ $('goalInput').value=data.goal;$('glassSize').value=String(data.glass);
+ $('entryCount').textContent=entries().length+' записей';
+ const list=$('historyList');list.innerHTML='';
+ if(!entries().length)list.textContent='Пока записей нет. Добавь первый стакан ♡';
+ [...entries()].reverse().forEach((e,revIndex)=>{const index=entries().length-1-revIndex;const div=document.createElement('div');div.className='entry';const left=document.createElement('div');left.innerHTML=`<strong>${e.ml} мл</strong><small>${e.time}</small>`;const del=document.createElement('button');del.className='delete';del.textContent='Удалить';del.onclick=()=>{data.days[today()].splice(index,1);save();render()};div.append(left,del);list.append(div)});
+ renderWeek();
+}
+function renderWeek(){
+ const names=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];let vals=[];
+ for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;vals.push({v:total(k),day:names[d.getDay()],date:k})}
+ const max=Math.max(data.goal,...vals.map(x=>x.v),1);$('weekBars').innerHTML='';
+ vals.forEach(x=>{let wrap=document.createElement('div');wrap.className='daybar';let track=document.createElement('div');track.className='bartrack';let fill=document.createElement('div');fill.className='barfill';fill.style.height=(x.v/max*100)+'%';track.append(fill);let b=document.createElement('b');b.textContent=x.day;let sm=document.createElement('small');sm.textContent=x.v?x.v>=1000?(x.v/1000).toFixed(1)+'л':x.v+'мл':'—';wrap.append(track,b,sm);$('weekBars').append(wrap)});
+ const avg=Math.round(vals.reduce((s,x)=>s+x.v,0)/7);$('weeklyAverage').textContent=avg.toLocaleString('ru-RU')+' мл';
+}
+function loadSettings(){ $('remindersOn').checked=data.reminders.on;$('startTime').value=data.reminders.start;$('endTime').value=data.reminders.end;$('interval').value=String(data.reminders.interval)}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addWater(b.dataset.add));
+$('addCustom').onclick=()=>{addWater($('customAmount').value);$('customAmount').value=''};
+$('addGlass').onclick=()=>addWater(data.glass);
+$('glassSize').onchange=e=>{data.glass=Number(e.target.value);save()};
+$('saveGoal').onclick=()=>{let n=Number($('goalInput').value);if(n>0&&n<=10000){data.goal=n;save();render();toast('Цель сохранена')}else toast('Проверь значение цели')};
+$('saveReminders').onclick=()=>{data.reminders={on:$('remindersOn').checked,start:$('startTime').value,end:$('endTime').value,interval:Number($('interval').value)};save();lastReminder=Date.now();toast('Настройки напоминаний сохранены')};
+$('notifyPermission').onclick=async()=>{if(!('Notification'in window)){toast('Уведомления не поддерживаются этим браузером');return}let p=await Notification.requestPermission();toast(p==='granted'?'Уведомления разрешены':'Разрешение не получено')};
+function checkReminder(){const r=data.reminders;if(!r.on)return;const now=new Date(),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),clock=hh+':'+mm;if(clock<r.start||clock>r.end)return;if(Date.now()-lastReminder<r.interval*60000)return;lastReminder=Date.now();toast('Небольшая пауза — если хочется, выпей воды ♡');if('Notification'in window&&Notification.permission==='granted'&&document.visibilityState==='visible'){new Notification('Время сделать паузу 💗',{body:'Если хочется, выпей немного воды.'})}}
+setInterval(checkReminder,15000);
+const d=new Date();$('todayLabel').textContent=d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',weekday:'short'});loadSettings();render();
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
